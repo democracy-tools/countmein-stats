@@ -20,28 +20,15 @@ steps:
     id: Push
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     args:
+      - beta
       - run
-      - services
+      - jobs
       - update
       - $_SERVICE_NAME
-      - '--platform=managed'
       - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
-      - >-
-        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID,$_LABELS
       - '--region=$_DEPLOY_REGION'
       - '--quiet'
     id: Deploy
-    entrypoint: gcloud
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
-    args:
-      - run
-      - services
-      - update-traffic
-      - $_SERVICE_NAME
-      - '--to-latest'
-      - '--region=$_DEPLOY_REGION'
-      - '--quiet'
-    id: Route-Traffic
     entrypoint: gcloud
 images:
   - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
