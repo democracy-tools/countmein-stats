@@ -36,3 +36,16 @@ func TestDirected_Score(t *testing.T) {
 	require.Equal(t, 1, directed.Get("8").Score)
 	require.Equal(t, 2, directed.Get("9").Score)
 }
+
+// 1 -> 2
+// 3 -> 2
+func TestDirected_Score_MultipleTrustedFlagEdges(t *testing.T) {
+
+	directed := NewDirected()
+	directed.AddEdge("1", true, "2", false)
+	directed.AddEdge("3", true, "2", false)
+
+	directed.Score()
+
+	require.Equal(t, FlagScore, directed.Get("2").Score)
+}

@@ -85,15 +85,18 @@ func (d *Directed) Score() {
 	}
 }
 
-func (d *Directed) scoreFlags() []*Vertex {
+func (d *Directed) scoreFlags() map[string]*Vertex {
 
-	flags := []*Vertex{}
+	flags := make(map[string]*Vertex)
 	for _, v := range d.trusted {
 		v.Score = TrustedScore
 		for _, currEdge := range v.edges {
-			if _, ok := d.untrusted[currEdge.to.id]; ok {
-				currEdge.to.Score = FlagScore
-				flags = append(flags, currEdge.to)
+			currFlagId := currEdge.to.id
+			if _, ok := flags[currFlagId]; !ok {
+				if _, ok = d.untrusted[currFlagId]; ok {
+					currEdge.to.Score = FlagScore
+					flags[currFlagId] = currEdge.to
+				}
 			}
 		}
 	}
@@ -102,7 +105,7 @@ func (d *Directed) scoreFlags() []*Vertex {
 }
 
 // scorePawn returns the number of flags that have path to the pawn
-func scorePawn(v *Vertex, flags []*Vertex) int {
+func scorePawn(v *Vertex, flags map[string]*Vertex) int {
 
 	score := 0
 	for _, currFlag := range flags {
