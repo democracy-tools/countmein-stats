@@ -85,7 +85,23 @@ func (d *Directed) Score() {
 	}
 }
 
-// scorePawn returns number of flags that have path to the pawn
+func (d *Directed) scoreFlags() []*Vertex {
+
+	flags := []*Vertex{}
+	for _, v := range d.trusted {
+		v.Score = TrustedScore
+		for _, currEdge := range v.edges {
+			if _, ok := d.untrusted[currEdge.to.id]; ok {
+				currEdge.to.Score = FlagScore
+				flags = append(flags, currEdge.to)
+			}
+		}
+	}
+
+	return flags
+}
+
+// scorePawn returns the number of flags that have path to the pawn
 func scorePawn(v *Vertex, flags []*Vertex) int {
 
 	score := 0
@@ -110,22 +126,6 @@ func findPath(from *Vertex, to string) bool {
 	}
 
 	return false
-}
-
-func (d *Directed) scoreFlags() []*Vertex {
-
-	flags := []*Vertex{}
-	for _, v := range d.trusted {
-		v.Score = TrustedScore
-		for _, currEdge := range v.edges {
-			if _, ok := d.untrusted[currEdge.to.id]; ok {
-				currEdge.to.Score = FlagScore
-				flags = append(flags, currEdge.to)
-			}
-		}
-	}
-
-	return flags
 }
 
 func isPawn(v *Vertex) bool {
